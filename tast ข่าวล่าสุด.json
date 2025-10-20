@@ -1,0 +1,288 @@
+{
+  "name": "tast ข่าวล่าสุด",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -16,
+        16
+      ],
+      "id": "04907d3a-85e4-4c67-8a9b-2a3040702316",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://www.techtalkthai.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        144
+      ],
+      "id": "bce16356-866a-4609-8c11-1e795d7ff711",
+      "name": "เทคโนโลยี / ไอที"
+    },
+    {
+      "parameters": {
+        "url": "https://www.matichon.co.th/feed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        288
+      ],
+      "id": "130d8079-cb38-4917-8b49-9b8ee500456f",
+      "name": "การเมือง"
+    },
+    {
+      "parameters": {
+        "url": "https://www.matichon.co.th/feed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d75c4931-167f-43fb-94e4-adacec4477d2",
+      "name": "ธุรกิจ / เศรษฐกิจ"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.bbci.co.uk/sport/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        432
+      ],
+      "id": "8c538adc-ddfd-481c-98c1-1a2f77000069",
+      "name": "กีฬา"
+    },
+    {
+      "parameters": {
+        "url": "https://workpointtoday.com/feed/",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        560
+      ],
+      "id": "89dcaefe-6cca-49bc-964d-40dad8eed458",
+      "name": "บันเทิง"
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.bbci.co.uk/thai/rss.xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        704
+      ],
+      "id": "d30f97ec-2127-4a1d-8e84-a91635a8ab9e",
+      "name": "ต่างประเทศ"
+    },
+    {
+      "parameters": {
+        "jsCode": "// สร้าง array สำหรับเก็บข่าวทั้งหมด\nconst allNews = [];\n\n// วนผ่านทุก input (RSS แต่ละหมวด เช่น กีฬา, บันเทิง)\nfor (const input of items) {\n  // สมมติว่าแต่ละ RSS ดึงข้อมูลมาในรูปแบบ input.json.items\n  const feedItems = input.json.items || [];\n\n  for (const article of feedItems) {\n    allNews.push({\n      title: article.title,\n      link: article.link,\n      pubDate: article.pubDate,\n      category: article.category || 'ทั่วไป'\n    });\n  }\n}\n\n// คืนค่าข่าวทั้งหมดในรูปแบบ items ของ n8n\nreturn allNews.map(news => ({ json: news }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        32
+      ],
+      "id": "92d06d2c-ef0d-4d40-8be6-9272c499d44b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1hxUmxPpwJgP8HPJB6hn3ob0ckTByx4Ls7Vow2jYfdwY",
+          "mode": "list",
+          "cachedResultName": "ฟอร์มสำหรับรับสมัครข่าวสาร  (การตอบกลับ)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hxUmxPpwJgP8HPJB6hn3ob0ckTByx4Ls7Vow2jYfdwY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 819260501,
+          "mode": "list",
+          "cachedResultName": "การตอบแบบฟอร์ม 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hxUmxPpwJgP8HPJB6hn3ob0ckTByx4Ls7Vow2jYfdwY/edit#gid=819260501"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRangeA1",
+              "range": "A:Z"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        32
+      ],
+      "id": "cff3b0f1-21c1-4cae-8723-b8c42ab77a57",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FXiVUtCQpeIzxTIQ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "ธุรกิจ / เศรษฐกิจ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "เทคโนโลยี / ไอที",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "การเมือง",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "กีฬา",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "บันเทิง",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ต่างประเทศ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "เทคโนโลยี / ไอที": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ธุรกิจ / เศรษฐกิจ": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "กีฬา": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "บันเทิง": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ต่างประเทศ": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "การเมือง": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "baf07077-57b0-4b61-b73b-9fd0b39a8b9d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f0b8a5e077b4ebba1a80c4ba3b00476a8d4dc9f9f17ab8fc5399aa7356709926"
+  },
+  "id": "2NCR35rMklkRC481",
+  "tags": []
+}

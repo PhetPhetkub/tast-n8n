@@ -1,0 +1,528 @@
+{
+  "name": "tast AI1",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1tvanOU4NkrSPKUwoGOxmO5ezbQaJC2xCFKaaBcA1zhA",
+          "mode": "list",
+          "cachedResultName": "การตอบคำถาม AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tvanOU4NkrSPKUwoGOxmO5ezbQaJC2xCFKaaBcA1zhA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1143234996,
+          "mode": "list",
+          "cachedResultName": "การตอบแบบฟอร์ม 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tvanOU4NkrSPKUwoGOxmO5ezbQaJC2xCFKaaBcA1zhA/edit#gid=1143234996"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -704,
+        16
+      ],
+      "id": "280138ea-33b1-44c3-98d1-a9b81de6534f",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "xOdtUXf6GIXg82yA",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8a848017-b323-4994-bb18-89cd9fe2a193",
+              "leftValue": "={{ $json.scoreNumber }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        16
+      ],
+      "id": "11a76612-b5fc-4657-8935-82a07d390c06",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1ChwtkEWylU8FlPNScwEtmCbePV2OxzTFWOhMMmZmEQw",
+          "mode": "list"
+        },
+        "name": "=ใบเกียรติบัตร-{{ $('Google Sheets Trigger').item.json['ชื่อ-นามสกุล (มีคำนำหน้า)'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        -64
+      ],
+      "id": "286d89de-46c0-440a-b578-fcc97f3546a5",
+      "name": "Copy file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "6Fc1N0e7Z7nNXesD",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "replaceText",
+        "presentationId": "={{ $json.id }}",
+        "textUi": {
+          "textValues": [
+            {
+              "text": "REPLACENAME",
+              "replaceText": "={{ $('Google Sheets Trigger').item.json['ชื่อ-นามสกุล (มีคำนำหน้า)'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSlides",
+      "typeVersion": 2,
+      "position": [
+        128,
+        -64
+      ],
+      "id": "d86fa964-d551-4532-a1bf-d239c4b86ed2",
+      "name": "Replace text in a presentation",
+      "credentials": {
+        "googleSlidesOAuth2Api": {
+          "id": "3fppURcrIUdWg5l5",
+          "name": "Google Slides account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $('Copy file').item.json.id }}/export?mimeType=application/pdf",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        288,
+        -64
+      ],
+      "id": "3039660d-8a51-4995-ac38-bea5bdf00d13",
+      "name": "HTTP Request",
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "nM2kZp2pINfqEvzf",
+          "name": "Google account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['ที่อยู่อีเมล'] }}",
+        "subject": "ยินดีด้วย! คุณผ่านการทดสอบความรู้ด้าน AI",
+        "message": "=เรียนคุณ{{ $('Google Sheets Trigger').item.json['ชื่อ-นามสกุล (มีคำนำหน้า)'] }} ,<br><br>ยินดีด้วย คุณผ่านการทดสอบความรู้เบื้องต้นเกี่ยวกับ AI ด้วยคะแนน {{ $('Google Sheets Trigger').item.json['คะแนน'] }}คะแนน<br>ทางเราได้แนบใบเกียรติบัตรมาในอีเมลฉบับนี้แล้ว<br><br>ขอแสดงความยินดี",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {}
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        -64
+      ],
+      "id": "9abe765c-37f6-406f-9057-b144b04a0128",
+      "name": "Send a message",
+      "webhookId": "0900addb-7cb8-4ec1-8bab-0ee3cee06f97",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VELTlXtQTwCtBuk4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1tvanOU4NkrSPKUwoGOxmO5ezbQaJC2xCFKaaBcA1zhA",
+          "mode": "list",
+          "cachedResultName": "การตอบคำถาม AI",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tvanOU4NkrSPKUwoGOxmO5ezbQaJC2xCFKaaBcA1zhA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1143234996,
+          "mode": "list",
+          "cachedResultName": "การตอบแบบฟอร์ม 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1tvanOU4NkrSPKUwoGOxmO5ezbQaJC2xCFKaaBcA1zhA/edit#gid=1143234996"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ที่อยู่อีเมล": "={{ $('Google Sheets Trigger').item.json['ที่อยู่อีเมล'] }}",
+            "status": "ส่งแล้ว"
+          },
+          "matchingColumns": [
+            "ที่อยู่อีเมล"
+          ],
+          "schema": [
+            {
+              "id": "ประทับเวลา",
+              "displayName": "ประทับเวลา",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "คะแนน",
+              "displayName": "คะแนน",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ชื่อ-นามสกุล (มีคำนำหน้า)",
+              "displayName": "ชื่อ-นามสกุล (มีคำนำหน้า)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "AI ย่อมาจากอะไร",
+              "displayName": "AI ย่อมาจากอะไร",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ข้อใดคือตัวอย่างของ AI ที่เราใช้งานในชีวิตประจำวันบ่อยที่สุด  ",
+              "displayName": "ข้อใดคือตัวอย่างของ AI ที่เราใช้งานในชีวิตประจำวันบ่อยที่สุด  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "AI ประเภทใดที่สามารถเรียนรู้และปรับปรุงตัวเองจากข้อมูลจำนวนมากได้  ",
+              "displayName": "AI ประเภทใดที่สามารถเรียนรู้และปรับปรุงตัวเองจากข้อมูลจำนวนมากได้  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Siri, Google Assistant, และ Alexa คือตัวอย่างของ AI ประเภทใด  ",
+              "displayName": "Siri, Google Assistant, และ Alexa คือตัวอย่างของ AI ประเภทใด  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "\"ChatGPT\" ที่โด่งดัง เป็น AI ที่มีความเชี่ยวชาญด้านใดเป็นพิเศษ  ",
+              "displayName": "\"ChatGPT\" ที่โด่งดัง เป็น AI ที่มีความเชี่ยวชาญด้านใดเป็นพิเศษ  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ข้อใด ไม่ใช่ ประโยชน์โดยตรงของ AI ในวงการแพทย์  ",
+              "displayName": "ข้อใด ไม่ใช่ ประโยชน์โดยตรงของ AI ในวงการแพทย์  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "สิ่งใดสำคัญที่สุดในการ \"ฝึกฝน\" (Training) AI ให้มีความฉลาดและแม่นยำ  ",
+              "displayName": "สิ่งใดสำคัญที่สุดในการ \"ฝึกฝน\" (Training) AI ให้มีความฉลาดและแม่นยำ  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "AI ที่ใช้ในการปลดล็อกสมาร์ทโฟนของคุณ คือเทคโนโลยีอะไร  ",
+              "displayName": "AI ที่ใช้ในการปลดล็อกสมาร์ทโฟนของคุณ คือเทคโนโลยีอะไร  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "รถยนต์ไร้คนขับ (Self-Driving Cars) ใช้ AI เพื่อทำสิ่งใดเป็นหลัก  ",
+              "displayName": "รถยนต์ไร้คนขับ (Self-Driving Cars) ใช้ AI เพื่อทำสิ่งใดเป็นหลัก  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ข้อใดคือความท้าทายหรือข้อกังวลที่สำคัญเกี่ยวกับ AI ในปัจจุบัน  ",
+              "displayName": "ข้อใดคือความท้าทายหรือข้อกังวลที่สำคัญเกี่ยวกับ AI ในปัจจุบัน  ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "ที่อยู่อีเมล",
+              "displayName": "ที่อยู่อีเมล",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        576,
+        144
+      ],
+      "id": "b3120047-d620-4286-963a-26d36e5a91ed",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FXiVUtCQpeIzxTIQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const score = parseFloat(item.json[\"คะแนน\"]) || 0;\n  item.json.scoreNumber = score;\n  return item;\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        16
+      ],
+      "id": "8ee71b1b-29c7-4689-bc0f-6c9c1ff1cff9",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Google Sheets Trigger').item.json['ที่อยู่อีเมล'] }}",
+        "subject": "แจ้งผลการทดสอบ AI",
+        "message": "=สวัสดี {{ $('Google Sheets Trigger').item.json['ชื่อ-นามสกุล (มีคำนำหน้า)'] }}\nคะแนนของคุณคือ {{ $json.scoreNumber }} คะแนน   น่าเสียดายที่ไม่ถึงเกณฑ์ 80 คะแนน   กรุณาลองใหม่อีกครั้ง",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -160,
+        112
+      ],
+      "id": "05ebeb0c-41a7-4af0-90d2-c83314ce66a5",
+      "name": "Send a message1",
+      "webhookId": "70a277ba-c637-4786-b6f9-e92b353abf95",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "VELTlXtQTwCtBuk4",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Copy file",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy file": {
+      "main": [
+        [
+          {
+            "node": "Replace text in a presentation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace text in a presentation": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message1": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "44ae03ac-2662-4c56-91a2-b515fb89b68d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f0b8a5e077b4ebba1a80c4ba3b00476a8d4dc9f9f17ab8fc5399aa7356709926"
+  },
+  "id": "rByDSlRkmVWWsLAl",
+  "tags": []
+}
